@@ -1,21 +1,40 @@
 import './style.css'
-import storageController from './storage-controller.js'
+import { updateStorage, retrieveStorage } from './storage-controller.js'
 import displayController from './display-controller.js'
-import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO } from 'date-fns'
+import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isEqual } from 'date-fns'
 
 console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
-const logicWrapper = (() => {
+;(() => {
   const projectList = []
 
   const todoFactory = (args = {}) => {
-  // template {name, description, dueDate, priority, notes, checklist}
+  // template {name, description, dueDate, priority, notes, checklist, isDone}
     return Object.assign({}, args)
   }
 
   const projectFactory = (args = {}) => {
-  // template {name,dueDate}
+  // template {name,dueDate, isDone}
     return Object.assign({}, args, {todoList: []})
+  }
+
+  const toggleBoolean = (obj, prop) => {
+    return (obj[prop]) ? false : true
+  }
+
+  const toggleDone = (obj) => {
+    const prop = ('isDone' in obj) ? 'isDone' : ('isChecked' in obj) ? 'isChecked' : null
+
+    return editProp(obj, prop, toggleBoolean(obj, prop))
+  }
+
+  const editProp = (obj, prop, newValue)  => {
+    return obj[prop] = newValue
+  }
+
+  const deleteObj = (obj, array) => {
+    const objIndex = array.indexOf(obj)
+    if (objIndex > -1) return array.splice(objIndex, 1)
   }
 
   const orderArray = (array) => {
@@ -23,11 +42,11 @@ const logicWrapper = (() => {
 
     if (array[0].dueDate) { 
       orderFunc = function (lastElem, nextElem) { 
-        return compareAsc(parseISO(lastElem.dueDate), parseISO(nextElem.dueDate))
+        return compareAsc(new Date(lastElem.dueDate), new Date(nextElem.dueDate))
       }
-    } else if ('isDone' in array[0]) {
+    } else if ('isChecked' in array[0]) {
       orderFunc = function (lastElem, nextElem) {
-        return (nextElem.isDone == false && lastElem.isDone == true) ? -1 : 1
+        return (nextElem.isChecked == false && lastElem.isChecked == true) ? -1 : 1
       }
     }
 
@@ -38,32 +57,76 @@ const logicWrapper = (() => {
     return array
   }
 
-  const addToList = (newObj, nameProject) => {
-    if (nameProject) {
-      const project = projectList.find(x => x.name === nameProject)
+  const orderAllArrays = () => {
+    orderArray(projectList)
+    projectList.forEach(project => orderArray(project.todoList))
+    projectList.forEach(project => project.todoList.forEach(todo => orderArray(todo.checklist)))
+  }
 
-      if (!project) {
-        addToList(projectFactory({name: nameProject, dueDate: newObj.dueDate}))
-        addToList(newObj, projectList[projectList.length - 1].name)
-        return orderArray(projectList)
-      }
+  const findProjectTodoList = (newObj, nameProject) => {
+    const project = projectList.find(x => x.name === nameProject)
 
-      orderArray(newObj.checklist)
-      project.todoList.push(newObj)
-      return orderArray(project.todoList)
+    if (!project) {
+      addToList(projectFactory({name: nameProject, dueDate: newObj.dueDate, isDone: newObj.isDone}))
+      return projectList[projectList.length -1].todoList
     } else {
-      projectList.push(newObj)
-      return orderArray(projectList)
+      return project.todoList
     }
   }
 
+  const addToList = (newObj, nameProject) => {
+    let targetList = projectList
+
+    if (nameProject) {
+      orderArray(newObj.checklist)
+      targetList = findProjectTodoList(newObj, nameProject)
+    }
+
+    targetList.push(newObj)
+  }
+
+  const checkToday = (objDate) => {
+  
+    const objDateFormat = lightFormat(new Date(objDate), 'yyyy-MM-dd')
+    const today = lightFormat(new Date(), 'yyyy-MM-dd')
+
+    return (objDateFormat === today) ? true : false
+  }
+
+
+  const checkAllDates = () => {
+    //today
+    projectList.forEach(project => project.isToday = checkToday(project.dueDate))
+    projectList.forEach(project => project.todoList.forEach(todo => todo.isToday = checkToday(todo.dueDate)))
+
+    //past
+    projectList.forEach(project => project.isPast = isPast(parseISO(project.dueDate)))
+    projectList.forEach(project => project.todoList.forEach(todo => todo.isPast = isPast(parseISO(todo.dueDate))))
+
+    //give time readable
+  }
+
+  const updateWrap = (func, ...args) => {
+    if (func) func(...args)
+    orderAllArrays()
+    checkAllDates()
+    updateStorage(projectList)
+  }
+
   const init = () => {
-    const dueDate = lightFormat(add(new Date(), {weeks: 1}), 'yyyy-MM-dd')
-    addToList(todoFactory({name: "Fill Todo App", description: "Fill this Todo App so it can assist me in my busy life.", dueDate, priority: "high", notes: "Very Important.", checklist: [{name:"first todo", isDone: true}, {name: "second todo", isDone: false}, {name: "third todo", isDone: true}, {name: "fourth todo", isDone: false}]}), "default")
+    if(!localStorage.length) {
+      const dueDate = add(new Date(), {weeks: 1})
+      addToList(todoFactory({name: "Fill Todo App", description: "Fill this Todo App so it can assist me in my busy life.", dueDate, priority: "high", notes: "Very Important.", checklist: [{name:"first todo", isChecked: true}, {name: "second todo", isChecked: false}, {name: "third todo", isChecked: true}, {name: "fourth todo", isChecked: false}], isDone: false}), "default")  
+    } else {
+      retrieveStorage().forEach(item => projectList.push(item))
+    }
+    updateWrap()
   }
 
   init()
 
   console.log(projectList)
+
+  // return init()
 
 })()
