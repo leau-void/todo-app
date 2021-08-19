@@ -1,8 +1,7 @@
 import './style.css'
 import { updateStorage, retrieveStorage } from './storage-controller.js'
 import displayController from './display-controller.js'
-import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isEqual, formatISO } from 'date-fns'
-import areIntervalsOverlappingWithOptions from 'date-fns/esm/fp/areIntervalsOverlappingWithOptions/index';
+import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isEqual, formatISO, isExists } from 'date-fns'
 import { displayAll } from './todo-from-phone'
 
 console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
@@ -36,12 +35,24 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     editObj (args = {}) {
       let form = (args.parent === projectList) ? forms[0] : forms[1]
       form.show()
-      form.self.name.value = args.self.name
-      form.isDone.find(element => element.value === `${args.self.isDone}`).checked = true
+      form.setSubmit("edit")
 
-      if (form.index === 1) {
+      for (let prop in args.self) {
+        if (!args.self.hasOwnProperty(prop)) continue
+        if (prop === "name" || prop === "notes" || prop === "description") {
+          form[prop].value = args.self[prop]
+        } else if (prop === "isDone" || prop === "priority") {
+          form[prop].find(input => input.value == args.self[prop].toString()).checked = true
+        } else if (prop === "dueDate") {
+          const objDate = new Date(args.self.dueDate)
+          form.date.value = lightFormat(objDate, "yyyy-MM-dd")
+          form.time.value = lightFormat(objDate, "HH:mm")
+        } else if (prop === "checklist") {
+          args.self.checklist.forEach(checklistItem => form.addChecklist(checklistItem))
+        }
         
       }
+
     },
 
     deleteObj (args) {
@@ -108,18 +119,24 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
       
     },
     show () {
-      this.self.reset()
+      this.resetSelf()
       this.self.classList.remove("visually-hidden")
       this.background.classList.remove("visually-hidden")
       if (this.index === 1) this.setSelectOption()
     },
     close () {
-      this.self.reset()
+      this.resetSelf()
       this.self.classList.add("visually-hidden")
       this.background.classList.remove("visually-hidden")
     },
+    resetSelf () {
+      this.self.reset()
+      this.setSubmit()
+      if (this.index === 1) Array.from(this.checklist.children).forEach(label => this.checklist.removeChild(label))
+    },
     submit (args = {}) {
       args.event.preventDefault()
+      if (!this.checkValidInput()) return this.notValidHandler()
       const argsAddToList = {}
 
       argsAddToList.newObj = (this.index === 0) ? projectFactory(this.getValues()) : todoFactory(this.getValues())
@@ -129,11 +146,43 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
         delete argsAddToList.newObj.project
       }
 
-      
+      if (args.oldTodoList) argsAddToList.todoList = args.oldTodoList
 
       this.addToList(argsAddToList)
 
+      if (args.oldObjParent) {
+        const oldObjIndex = args.oldObjParent.findIndex(element => element === args.oldObj)
+        args.oldObjParent.splice(oldObjIndex, 1)
+      }
+
       this.close()
+    },
+    setSubmit (action) {
+      const submitBtn = this.self.submit
+      const isEdit = (action && action === "edit")
+
+      submitBtn.value = (isEdit) ? "Save" : "Add"
+      submitBtn.dataset.handler = (isEdit) ? "saveEdit" : "submit"
+    },
+    saveEdit(args = {}) {
+      if (args.event) args.event.preventDefault()
+      const oldObjParent = (this.index === 0) ? projectList : projectList.find(project => project.selected).todoList
+      const oldObj = oldObjParent.find(obj => obj.selected)
+      if (oldObjParent === projectList) args = Object.assign(args, {oldTodoList: oldObj.todoList})
+      const newArgs = Object.assign(args, {oldObjParent, oldObj})
+
+      this.submit(newArgs)
+    },
+    checkValidInput () {
+      const requiredInputs = ["name", "date", "time"]
+
+      return requiredInputs.every(inputName => {
+        return this[inputName].checkValidity()
+        if (inputName === "date" && !isExists(...(this.date.value.split("-")))) return false
+      })
+    },
+    notValidHandler () {
+      alert("Name, Date and Time must have a value.\n" + "Date must be a valid date.")
     },
     getValues () {
       const valuesObj = {}
@@ -152,10 +201,10 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     },
     undefHandler (prop) {
       let selected
-      switch (prop) {  
-        case "isDone" || "priority":
+      switch (prop) {
+        case "isDone":
           selected = this[prop].find(element => element.checked)
-          return selected.value
+          return JSON.parse(selected.value)
           break;
         case "priority":
           selected = this[prop].find(element => element.checked)
@@ -179,15 +228,15 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
     },
     addChecklist (args = {}) {
-      args.event.preventDefault()
+      if (args.event) args.event.preventDefault()
       
       const label = document.createElement("label")
-      label.textContent = this.self.inputChecklist.value
+      label.textContent = args.name || this.self.inputChecklist.value
       label.classList.add("checkbox-label-form")
       label.dataset.checklist = ""
       const checkbox = document.createElement("input")
       checkbox.setAttribute("type", "checkbox")
-      checkbox.checked = false
+      checkbox.checked = args.isChecked || false
       checkbox.classList.add("checkbox-form")
       label.appendChild(checkbox)
       const deleteBtn = document.createElement("button")
