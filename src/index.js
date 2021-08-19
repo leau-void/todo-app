@@ -3,7 +3,7 @@ import { updateStorage, retrieveStorage } from './storage-controller.js'
 import displayController from './display-controller.js'
 import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isEqual, formatISO } from 'date-fns'
 import areIntervalsOverlappingWithOptions from 'date-fns/esm/fp/areIntervalsOverlappingWithOptions/index';
-import roundToNearestMinutes from 'date-fns/fp/roundToNearestMinutes';
+import { displayAll } from './todo-from-phone'
 
 console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
@@ -22,8 +22,26 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
       return this.editProp(prop, this.toggleBoolean(prop))
     },
 
+    togglePriority () {
+      const prio = ["low", "medium", "high"]
+      const whichCurrent = prio.findIndex(possibility => possibility === this.priority)
+      const newPrio = (whichCurrent === 2) ? prio[0] : prio[whichCurrent + 1]
+      return this.editProp("priority", newPrio)
+    },
+
     editProp (prop, newValue) {
       return this[prop] = newValue
+    },
+
+    editObj (args = {}) {
+      let form = (args.parent === projectList) ? forms[0] : forms[1]
+      form.show()
+      form.self.name.value = args.self.name
+      form.isDone.find(element => element.value === `${args.self.isDone}`).checked = true
+
+      if (form.index === 1) {
+        
+      }
     },
 
     deleteObj (args) {
@@ -83,7 +101,6 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
         let targetList = projectList
     
         if (args.project) {
-          args.newObj.orderSelfArrays()
           targetList = findProjectTodoList(args.newObj, args.project)
         }
     
@@ -107,8 +124,9 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
       argsAddToList.newObj = (this.index === 0) ? projectFactory(this.getValues()) : todoFactory(this.getValues())
 
-      if (this.self.project) { 
-        argsAddToList.project = this.self.project.value
+      if ("project" in argsAddToList.newObj) { 
+        argsAddToList.project = argsAddToList.newObj.project
+        delete argsAddToList.newObj.project
       }
 
       
@@ -121,6 +139,10 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
       const valuesObj = {}
       for (let prop in this) {
         if (this.hasOwnProperty(prop) && prop !== "date" && prop !== "time" && prop !== "background" && prop !== "self" && prop !== "index") valuesObj[prop] = this[prop].value || this.undefHandler(prop)
+      }
+
+      for (let prop in valuesObj) {
+        if (valuesObj[prop] === null || valuesObj[prop] === undefined) delete valuesObj[prop]
       }
 
       let date = [this.date.value, this.time.value].join("T")
@@ -140,16 +162,50 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
           return selected.value 
           break;
         case "checklist":
+          const arrayCheckListObj = []
+          Array.from(this.checklist.children).forEach(checkboxLabel => {
+            const checklistObj = {}
+            checklistObj.name = checkboxLabel.textContent
+            checklistObj.isChecked = checkboxLabel.children[0].checked
+
+            arrayCheckListObj.push(checklistObj)
+          })
+
+          return arrayCheckListObj
           break;
         default:
           null
       }
 
     },
-    addChecklist () {
+    addChecklist (args = {}) {
+      args.event.preventDefault()
+      
+      const label = document.createElement("label")
+      label.textContent = this.self.inputChecklist.value
+      label.classList.add("checkbox-label-form")
+      label.dataset.checklist = ""
+      const checkbox = document.createElement("input")
+      checkbox.setAttribute("type", "checkbox")
+      checkbox.checked = false
+      checkbox.classList.add("checkbox-form")
+      label.appendChild(checkbox)
+      const deleteBtn = document.createElement("button")
+      deleteBtn.textContent = "X"
+      deleteBtn.classList.add("delete-button")
+      deleteBtn.setAttribute("data-handler", "deleteChecklist")
+      label.appendChild(deleteBtn)
+      this.checklist.appendChild(label)
 
+      this.self.inputChecklist.value = ""
+    },
+    deleteChecklist (args = {}) {
+      const closestLabel = event.target.closest("[data-checklist]")
+      this.checklist.removeChild(closestLabel)
     },
     setSelectOption () {
+      Array.from(this.project.children).forEach(oldOption => this.project.removeChild(oldOption))
+
       for (let i = 0; i < projectList.length; i++) {
         let newOption = document.createElement("option")
         newOption.textContent = projectList[i].name
@@ -186,6 +242,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
     if (index === 1) {
       obj.checklist = document.getElementById("checklist-form-div")
+      obj.self.inputChecklist = document.getElementById("checklist-input-form")
     }
 
     return Object.assign(Object.create(protoForm), obj)
@@ -195,15 +252,12 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
   const orderArray = (array) => {
     let orderFunc
 
-    if (array[0].dueDate) { 
+    if (array[0] && array[0].dueDate) { 
       orderFunc = function (lastElem, nextElem) { 
         return compareAsc(new Date(lastElem.dueDate), new Date(nextElem.dueDate))
       }
-    } else if ('isChecked' in array[0]) {
-      orderFunc = function (lastElem, nextElem) {
-        return (nextElem.isChecked == false && lastElem.isChecked == true) ? -1 : 1
-      }
     }
+    
 
 
     array.sort((lastElem, nextElem) => {
@@ -215,14 +269,13 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
   const orderAllArrays = () => {
     orderArray(projectList)
     projectList.forEach(project => project.orderSelfArrays())
-    projectList.forEach(project => project.todoList.forEach(todo => todo.orderSelfArrays()))
   }
 
   const findProjectTodoList = (newObj, nameProject) => {
     const project = projectList.find(x => x.name === nameProject)
 
     if (!project) {
-      forms[0].addToList(projectFactory({name: nameProject, dueDate: newObj.dueDate, isDone: newObj.isDone}))
+      forms[0].addToList({newObj: projectFactory({name: nameProject, dueDate: newObj.dueDate, isDone: newObj.isDone})})
       return projectList[projectList.length -1].todoList
     } else {
       return project.todoList
@@ -236,6 +289,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
     orderAllArrays()
     updateStorage(projectList)
+    displayAll(projectList)
   }
 
   const clickHandler = () => {
@@ -262,7 +316,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     let parent
     let self
 
-    if (project = "forms") {
+    if (project === "forms") {
       parent = forms
       self = parent[todo]
 

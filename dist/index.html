@@ -3,13 +3,15 @@
   <title>Leau's Todo App</title>
 <script defer src="index.bundle.js"></script></head>
 <body>
-  <div id="project-display">
-<button class="add-button" data-path="forms,0" data-handler="show">Add Project</button>
+  <div id="project-container">
   </div>
+  <button class="add-button" data-path="forms,0" data-handler="show">Add Project</button>
 
-  <div id="todo-display">
-<button class="add-button" data-path="forms,1" data-handler="show">Add Todo</button>
+
+  <div id="todo-container">
   </div>
+  <button class="add-button" data-path="forms,1" data-handler="show">Add Todo</button>
+
 
   <form id="project-form" class="add-forms visually-hidden" data-path="forms,0">
 <label>Enter the title of your Project :
@@ -73,16 +75,13 @@
     <input name="isDone" class="radio-input" type="radio" value=true id="done-todo-true">
 
     <label>Insert a Checklist item in this Todo?
-      <input type="text" class="no-form">
+      <input type="text" class="no-form" id="checklist-input-form">
       <button id="add-checklist-button" value="add" class="no-form" data-handler="addChecklist">Add</button>
       <div id="checklist-form-div">
-        <label class="checklist-element">Prepare the Todo
-          <input type="checkbox" class="no-form">
-        </label>
       </div>
     </label>
 
-    <input type="button" value="X" class="close-form-btn no-form" data-path="add-forms,1" data-handler="close">
+    <input type="button" value="X" class="close-form-btn no-form" data-path="forms,1" data-handler="close">
   
     <input type="submit" class="submit-form no-form" id="submit-todo-form" data-handler="submit" class="no-form">
 </form>
