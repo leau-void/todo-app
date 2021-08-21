@@ -1,5 +1,380 @@
-h1 {
-    color: red;
+:root {
+  font-size: 100%;
+}
+
+html {
+  width: 100%;
+  background: linear-gradient(45deg, red, blue);
+}
+
+body {
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+#main-container {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: row;
+  height: 90%;
+  height: fit-content;
+}
+
+#project-container {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+}
+
+#todo-container {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+}
+
+.content-div {
+  width: 70%;
+  height: fit-content;
+  min-height: 200px;
+  border: 2px solid grey;
+  border-radius: 10px;
+  margin: 10px auto;
+  padding: 15px;
+  padding-left: 60px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  position: relative;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+#project-container > .content-div {
+  background-color: lightsalmon;
+}
+
+#todo-container > .content-div {
+  background-color: lightsteelblue;
+}
+.corner-button {
+  position: absolute;
+  right: 10px;
+  height: 40px;
+  max-width: 40px;
+  border: 2px solid grey;
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+.corner-button:active {
+  border-color: black;
+}
+
+.edit-button {
+  top: 10px;
+}
+
+.delete-button {
+  top: 60px;
+}
+
+.content-div > * {
+  width: 100px;
+  padding: 10px;
+}
+
+.toggle-button {
+  border-radius: 5px;
+  width: 80px;
+  height: 40px;
+  border: 3px solid black;
+  background-color: black;
+  color: white;
+}
+
+.name {
+  order: 0;
+  font-size: 1.5rem;
+  width: 200px;
+  text-align: center;
+  font-weight: bold;
+  overflow-wrap: break-word;
+}
+
+.date {
+  order: 1;
+}
+
+.date .date-relative {
+  margin-top: 10px;
+  padding-left: 5px;
+  border-left: 2px solid grey;
+
+}
+
+.done-label {
+  order: 2;
+}
+
+.priority-label {
+  order: 4;
+}
+
+.notes-label {
+  order: 5;
+  width: 200px;
+}
+
+.description-label {
+  order: 3;
+  width: 200px;
+}
+
+.checklist-display {
+  order: 99;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.checklist-element {
+  padding: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.checkbox {
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+.labels {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.3rem;
+}
+
+.labels > * {
+  font-size: 1.2rem;
+}
+
+.labels :first-child {
+  margin-top: 10px;
+}
+
+.done-true > button {
+  border-color: green;
+}
+
+.done-false > button {
+  border-color: red;
+}
+
+.low > button {
+  border-color: green;
+}
+
+.medium > button {
+  border-color: yellow;
+}
+
+.high > button {
+  border-color: red;
+}
+
+
+.selected {
+  border-color: black;
+}
+
+#main-container .content-div.today {
+  background-color: rgb(76, 170, 207);
+
+}
+
+.today .date-relative {
+  font-weight: bold;
+}
+
+#main-container .content-div.past {
+  opacity: 0.6;
+}
+
+.past .date {
+  color: red;
+}
+
+#add-buttons {
+  position: fixed;
+  width: calc(100% - 100px);
+  bottom: 80px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 50px;
+}
+
+.add-button {
+  height: 60px;
+  width: 100px;
+  border-radius: 10px;
+  border: 2px solid black;
+  background-color: lightgrey;
+  font-size: 1.2rem;
+}
+
+.add-button:hover {
+  background-color: grey;
+}
+
+form {
+  z-index: 100;
+  min-height: 400px;
+  max-height: 90%;
+  min-width: 90%;
+  background-color: rebeccapurple;
+  position: fixed;
+  margin: 20px calc(5% - 40px);
+  border: 2px solid white;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 20px;
+  color: white;
+  padding: 20px 0;
+  padding-right: 80px;
+}
+
+form > * {
+  width: 300px;
+  margin: 10px 20px;
+}
+
+form > label {
+  display: flex;
+  flex-direction: column;
+}
+
+form input[type="submit"], form input[type="button"] {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+form input[type="submit"] {
+  top: unset;
+  bottom: 20px;
+}
+
+form input[type="submit"], form input[type="button"], form button {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+  border-radius: 10px;
+}
+
+#add-checklist-button {
+  padding: 5px;
+  width: fit-content
+}
+
+form input[type="submit"]:active, form input[type="button"]:active, form button:active {
+  background-color: white;
+  color: rebeccapurple;
+  box-shadow: 0 0 3px 3px white;
+}
+
+
+.div-radio {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-areas: 
+  "main main"
+  "label input"
+  "label input"
+  "label input"
+  ;
+  align-items: center;
+}
+
+.main-label {
+  grid-area: main;
+}
+
+.main-label ~ label {
+  text-align: right;
+  padding-right: 10px;
+  margin-top: 10px;
+}
+
+.div-radio input[type="radio"] {
+  margin-top: 10px;
+}
+
+input[type="text"], textarea, select, option, input[type="time"], input[type="date"] {
+  padding: 5px;
+  outline: none;
+  border: none;
+  border-left: 3px solid white;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus, option:focus, input[type="time"]:focus, input[type="date"]:focus {
+  border-left: 3px solid black;
+}
+
+
+
+.background-form {
+  height: 100vh;
+  min-width: 100%;
+  opacity: 0.7;
+  z-index: 99;
+  background-color: turquoise;
+  position: fixed;
+}
+
+.header {
+  height: 100px;
+  width: 100%;
+  color: white;
+  font-size: 20px;
+}
+
+.header h1 {
+  text-align: center;
+}
+
+.footer {
+  height: 35px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  border-top: 2px solid white;
+}
+
+:any-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.3rem;
+  line-height: 35px;
+}
+
+:any-link:hover {
+  text-decoration: underline;
 }
 
 .visually-hidden {

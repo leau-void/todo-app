@@ -1,8 +1,8 @@
+import './normalize.css'
 import './style.css'
 import { updateStorage, retrieveStorage } from './storage-controller.js'
-import displayController from './display-controller.js'
-import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isEqual, formatISO, isExists } from 'date-fns'
-import { displayAll } from './todo-from-phone'
+import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isExists } from 'date-fns'
+import { displayAll } from './display-controller.js'
 
 console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
@@ -72,6 +72,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     },
 
     getFormattedTime () {
+      
       return formatDistanceToNow((new Date(this.dueDate)), { addSuffix: true })
     },
 
@@ -127,7 +128,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     close () {
       this.resetSelf()
       this.self.classList.add("visually-hidden")
-      this.background.classList.remove("visually-hidden")
+      this.background.classList.add("visually-hidden")
     },
     resetSelf () {
       this.self.reset()
@@ -215,6 +216,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
           Array.from(this.checklist.children).forEach(checkboxLabel => {
             const checklistObj = {}
             checklistObj.name = checkboxLabel.textContent
+            // Now they take X of child node into the textContent with add todo or edit, but will fix when changed to an image
             checklistObj.isChecked = checkboxLabel.children[0].checked
 
             arrayCheckListObj.push(checklistObj)

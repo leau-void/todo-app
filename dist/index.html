@@ -1,17 +1,25 @@
 
 <head>
-  <title>Leau's Todo App</title>
+  <title>organize.io</title>
 <script defer src="index.bundle.js"></script></head>
 <body>
+
+  <div class="header">
+    <h1>Organize your life</h1>
+  </div>
+<div id="main-container">
   <div id="project-container">
   </div>
-  <button class="add-button" data-path="forms,0" data-handler="show">Add Project</button>
 
 
   <div id="todo-container">
   </div>
-  <button class="add-button" data-path="forms,1" data-handler="show">Add Todo</button>
+</div>
 
+<div id="add-buttons">
+  <button class="add-button" data-path="forms,0" data-handler="show">Add Project</button>
+  <button class="add-button" data-path="forms,1" data-handler="show">Add Todo</button>
+</div>
 
   <form id="project-form" class="add-forms visually-hidden" data-path="forms,0">
 <label>Enter the title of your Project :
@@ -21,12 +29,15 @@
   <input class="date-input" name="date" type="date" required>
   <input class="time-input" name="time" type="time" value="18:00" required>
 </label>
-<label>Did you finish what you had to do for this Project?
-</label>
+
+<div class="div-radio">
+  <label class="main-label">Did you finish what you had to do for this Project?
+  </label>
   <label for="done-project-false" class="radio-label">No</label>
   <input name="isDone" class="radio-input" type="radio" value=false id="done-project-false" checked=true>
   <label for="done-project-true" class="radio-label">Yes</label>
   <input name="isDone" class="radio-input" type="radio" value=true id="done-project-true">
+</div>
 
   <input type="button" value="X" class="close-form-btn no-form" data-path="forms,0" data-handler="close">
 
@@ -40,7 +51,7 @@
   <label>Enter the title of your Todo :
     <input type="text" name="name" required>
   </label>
-  <label>Enter a description your Todo :
+  <label>Enter a description of your Todo :
     <textarea style="resize: none;" rows=3 name="description"></textarea>
   </label>
 
@@ -54,7 +65,8 @@
   </select>
 </label>
 
-  <label>What is the priority of this Todo?
+<div class="div-radio">
+  <label class="main-label">What is the priority of this Todo?
   </label>
     <label for="priority-todo-high" class="radio-label">High</label>
     <input name="priority" class="radio-input" type="radio" value="high" id="priority-todo-high">
@@ -62,18 +74,20 @@
     <input name="priority" class="radio-input" type="radio" value="medium" id="priority-todo-medium" checked=true>
     <label for="priority-todo-low" class="radio-label">Low</label>
     <input name="priority" class="radio-input" type="radio" value="low" id="priority-todo-low">
-  
+  </div>
+
     <label>Do you have notes to keep for this Todo ?
       <textarea name="notes" style="resize: none;" rows=2></textarea>
     </label>
-
-  <label>Did you finish what you had to do for this Todo?
+<div class="div-radio">
+  <label class="main-label">Did you finish what you had to do for this Todo?
   </label>
     <label for="done-todo-false" class="radio-label">No</label>
     <input name="isDone" class="radio-input " type="radio" value=false id="done-todo-false" checked=true>
     <label for="done-todo-true" class="radio-label">Yes</label>
     <input name="isDone" class="radio-input" type="radio" value=true id="done-todo-true">
-
+  </div>
+  
     <label>Insert a Checklist item in this Todo?
       <input type="text" class="no-form" id="checklist-input-form">
       <button id="add-checklist-button" value="add" class="no-form" data-handler="addChecklist">Add</button>
@@ -85,5 +99,10 @@
   
     <input type="submit" name="submit" class="submit-form no-form" id="submit-todo-form" data-handler="submit" class="no-form">
 </form>
+
+<div class="footer">
+<a href="../README.md">README</a>
+<a href="#/">GitHub</a>
+</div>
 
 </body>
