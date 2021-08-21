@@ -38,12 +38,10 @@ body {
 .content-div {
   width: 70%;
   height: fit-content;
-  min-height: 200px;
   border: 2px solid grey;
   border-radius: 10px;
   margin: 10px auto;
   padding: 15px;
-  padding-left: 60px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -64,7 +62,7 @@ body {
   right: 10px;
   height: 40px;
   max-width: 40px;
-  border: 2px solid grey;
+  border: 2px solid black;
   background-color: transparent;
   border-radius: 10px;
 }
@@ -221,6 +219,7 @@ body {
 }
 
 .add-button {
+  font-weight: bold;
   height: 60px;
   width: 100px;
   border-radius: 10px;
@@ -379,4 +378,60 @@ input[type="text"]:focus, textarea:focus, select:focus, option:focus, input[type
 
 .visually-hidden {
   display: none;
+}
+
+@media (max-width: 800px) and (orientation: portrait) {
+  #main-container {
+    flex-direction: column;
+  }
+
+  #project-container {
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  #todo-container {
+    width: 100%;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    min-height: unset;
+    max-height: 100vh;
+  }
+
+  #main-container {
+    flex-direction: row;
+    height: calc(100% - 135px);
+  }
+
+  #project-container {
+    overflow-y: scroll;
+    
+  }
+
+  #todo-container {
+    overflow-y: scroll;
+  }
+
+  .content-div {
+    min-height: fit-content;
+    width: 80%;
+    padding: 5px;
+    padding-right: 60px;  
+  }
+
+  #project-container .content-div {
+    width: 50%;
+  }
+
+  .name {
+    width: fit-content;
+  }
+
+  .content-div > * {
+    width: fit-content;
+  }
+  
 }
