@@ -4,7 +4,7 @@ import { updateStorage, retrieveStorage } from './storage-controller.js'
 import { formatDistanceToNow, add, lightFormat, compareAsc, parseISO, isPast, isExists } from 'date-fns'
 import { displayAll } from './display-controller.js'
 
-console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
+/* global alert localStorage event */
 
 ;(() => {
   const projectList = []
@@ -17,15 +17,15 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
 
     toggleDone () {
       const prop = ('isDone' in this) ? 'isDone' : ('isChecked' in this) ? 'isChecked' : null
-  
+
       return this.editProp(prop, this.toggleBoolean(prop))
     },
 
     togglePriority () {
-      const prio = ["low", "medium", "high"]
+      const prio = ['low', 'medium', 'high']
       const whichCurrent = prio.findIndex(possibility => possibility === this.priority)
       const newPrio = (whichCurrent === 2) ? prio[0] : prio[whichCurrent + 1]
-      return this.editProp("priority", newPrio)
+      return this.editProp('priority', newPrio)
     },
 
     editProp (prop, newValue) {
@@ -33,26 +33,24 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     },
 
     editObj (args = {}) {
-      let form = (args.parent === projectList) ? forms[0] : forms[1]
+      const form = (args.parent === projectList) ? forms[0] : forms[1]
       form.show()
-      form.setSubmit("edit")
-
-      for (let prop in args.self) {
-        if (!args.self.hasOwnProperty(prop)) continue
-        if (prop === "name" || prop === "notes" || prop === "description") {
+      form.setSubmit('edit')
+      const has = Object.prototype.hasOwnProperty
+      for (const prop in args.self) {
+        if (!has.call(args.self, prop)) continue
+        if (prop === 'name' || prop === 'notes' || prop === 'description') {
           form[prop].value = args.self[prop]
-        } else if (prop === "isDone" || prop === "priority") {
-          form[prop].find(input => input.value == args.self[prop].toString()).checked = true
-        } else if (prop === "dueDate") {
+        } else if (prop === 'isDone' || prop === 'priority') {
+          form[prop].find(input => input.value === args.self[prop].toString()).checked = true
+        } else if (prop === 'dueDate') {
           const objDate = new Date(args.self.dueDate)
-          form.date.value = lightFormat(objDate, "yyyy-MM-dd")
-          form.time.value = lightFormat(objDate, "HH:mm")
-        } else if (prop === "checklist") {
+          form.date.value = lightFormat(objDate, 'yyyy-MM-dd')
+          form.time.value = lightFormat(objDate, 'HH:mm')
+        } else if (prop === 'checklist') {
           args.self.checklist.forEach(checklistItem => form.addChecklist(checklistItem))
         }
-        
       }
-
     },
 
     deleteObj (args) {
@@ -63,8 +61,8 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     checkToday () {
       const objDateFormat = lightFormat(new Date(this.dueDate), 'yyyy-MM-dd')
       const today = lightFormat(new Date(), 'yyyy-MM-dd')
-  
-      return (objDateFormat === today) ? true : false
+
+      return (objDateFormat === today)
     },
 
     checkPast () {
@@ -72,18 +70,17 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     },
 
     getFormattedTime () {
-      
       return formatDistanceToNow((new Date(this.dueDate)), { addSuffix: true })
     },
 
     orderSelfArrays () {
-      for (let key in this) {
+      for (const key in this) {
         if (this[key] instanceof Array) orderArray(this[key])
       }
     },
 
     setPrototypeOfChildren () {
-      for (let key in this) {
+      for (const key in this) {
         if (this[key] instanceof Array) this[key].forEach(item => Object.setPrototypeOf(item, proto))
       }
     },
@@ -95,7 +92,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
   }
 
   const todoFactory = (args = {}) => {
-  // template {name, description, dueDate, priority, notes, checklist, isDone}
+    // template {name, description, dueDate, priority, notes, checklist, isDone}
 
     if (args.checklist instanceof Array) args.checklist.forEach(item => Object.setPrototypeOf(item, proto))
 
@@ -103,32 +100,30 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
   }
 
   const projectFactory = (args = {}) => {
-  // template {name,dueDate, isDone}
-    return Object.assign(Object.create(proto), args, {todoList: []})
+    // template {name,dueDate, isDone}
+    return Object.assign(Object.create(proto), args, { todoList: [] })
   }
-
 
   const protoForm = {
     addToList (args = {}) {
-        let targetList = projectList
-    
-        if (args.project) {
-          targetList = findProjectTodoList(args.newObj, args.project)
-        }
-    
-        targetList.push(args.newObj)
-      
+      let targetList = projectList
+
+      if (args.project) {
+        targetList = findProjectTodoList(args.newObj, args.project)
+      }
+
+      targetList.push(args.newObj)
     },
     show () {
       this.resetSelf()
-      this.self.classList.remove("visually-hidden")
-      this.background.classList.remove("visually-hidden")
+      this.self.classList.remove('visually-hidden')
+      this.background.classList.remove('visually-hidden')
       if (this.index === 1) this.setSelectOption()
     },
     close () {
       this.resetSelf()
-      this.self.classList.add("visually-hidden")
-      this.background.classList.add("visually-hidden")
+      this.self.classList.add('visually-hidden')
+      this.background.classList.add('visually-hidden')
     },
     resetSelf () {
       this.self.reset()
@@ -138,17 +133,17 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     submit (args = {}) {
       args.event.preventDefault()
       if (!this.checkValidInput()) return this.notValidHandler()
-      const argsAddToList = {}
+      const argsAddToList = {}
 
       argsAddToList.newObj = (this.index === 0) ? projectFactory(this.getValues()) : todoFactory(this.getValues())
 
-      if ("project" in argsAddToList.newObj) { 
+      if ('project' in argsAddToList.newObj) {
         argsAddToList.project = argsAddToList.newObj.project
         delete argsAddToList.newObj.project
       }
 
       if (args.oldTodoList) argsAddToList.newObj.todoList = args.oldTodoList
-      
+
       argsAddToList.newObj.selected = true
 
       this.addToList(argsAddToList)
@@ -162,59 +157,59 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     },
     setSubmit (action) {
       const submitBtn = this.self.submit
-      const isEdit = (action && action === "edit")
+      const isEdit = (action && action === 'edit')
 
-      submitBtn.value = (isEdit) ? "Save" : "Add"
-      submitBtn.dataset.handler = (isEdit) ? "saveEdit" : "submit"
+      submitBtn.value = (isEdit) ? 'Save' : 'Add'
+      submitBtn.dataset.handler = (isEdit) ? 'saveEdit' : 'submit'
     },
-    saveEdit(args = {}) {
+    saveEdit (args = {}) {
       if (args.event) args.event.preventDefault()
       const oldObjParent = (this.index === 0) ? projectList : projectList.find(project => project.selected).todoList
       const oldObj = oldObjParent.find(obj => obj.selected)
-      if (oldObjParent === projectList) args = Object.assign(args, {oldTodoList: oldObj.todoList})
-      const newArgs = Object.assign(args, {oldObjParent, oldObj})
+      if (oldObjParent === projectList) args = Object.assign(args, { oldTodoList: oldObj.todoList })
+      const newArgs = Object.assign(args, { oldObjParent, oldObj })
 
       this.submit(newArgs)
     },
     checkValidInput () {
-      const requiredInputs = ["name", "date", "time"]
+      const requiredInputs = ['name', 'date', 'time']
 
       return requiredInputs.every(inputName => {
+        if (inputName === 'date' && !isExists(...(this.date.value.split('-')))) return false
         return this[inputName].checkValidity()
-        if (inputName === "date" && !isExists(...(this.date.value.split("-")))) return false
       })
     },
     notValidHandler () {
-      alert("Name, Date and Time must have a value.\n" + "Date must be a valid date.")
+      alert('Name, Date and Time must have a value.\n' + 'Date must be a valid date.')
     },
     getValues () {
       const valuesObj = {}
-      for (let prop in this) {
-        if (this.hasOwnProperty(prop) && prop !== "date" && prop !== "time" && prop !== "background" && prop !== "self" && prop !== "index") valuesObj[prop] = this[prop].value || this.undefHandler(prop)
+      const has = Object.prototype.hasOwnProperty
+      for (const prop in this) {
+        if (has.call(this, prop) && prop !== 'date' && prop !== 'time' && prop !== 'background' && prop !== 'self' && prop !== 'index') valuesObj[prop] = this[prop].value || this.undefHandler(prop)
       }
 
-      for (let prop in valuesObj) {
+      for (const prop in valuesObj) {
         if (valuesObj[prop] === null || valuesObj[prop] === undefined) delete valuesObj[prop]
       }
 
-      let date = [this.date.value, this.time.value].join("T")
+      const date = [this.date.value, this.time.value].join('T')
       valuesObj.dueDate = new Date(parseISO(date))
 
       return valuesObj
     },
     undefHandler (prop) {
       let selected
+      const arrayCheckListObj = []
+
       switch (prop) {
-        case "isDone":
+        case 'isDone':
           selected = this[prop].find(element => element.checked)
           return JSON.parse(selected.value)
-          break;
-        case "priority":
+        case 'priority':
           selected = this[prop].find(element => element.checked)
-          return selected.value 
-          break;
-        case "checklist":
-          const arrayCheckListObj = []
+          return selected.value
+        case 'checklist':
           Array.from(this.checklist.children).forEach(checkboxLabel => {
             const checklistObj = {}
             checklistObj.name = checkboxLabel.textContent
@@ -225,44 +220,40 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
           })
 
           return arrayCheckListObj
-          break;
-        default:
-          null
       }
-
     },
     addChecklist (args = {}) {
       if (args.event) args.event.preventDefault()
-      
-      const label = document.createElement("label")
-      label.textContent = args.name || this.self.inputChecklist.value
-      label.classList.add("checkbox-label-form")
-      label.dataset.checklist = ""
-      const checkbox = document.createElement("input")
-      checkbox.setAttribute("type", "checkbox")
+
+      const label = document.createElement('label')
+      label.textContent = args.name || this.self.inputChecklist.value
+      label.classList.add('checkbox-label-form')
+      label.dataset.checklist = ''
+      const checkbox = document.createElement('input')
+      checkbox.setAttribute('type', 'checkbox')
       checkbox.checked = args.isChecked || false
-      checkbox.classList.add("checkbox-form")
+      checkbox.classList.add('checkbox-form')
       label.appendChild(checkbox)
-      const deleteBtn = document.createElement("button")
-      deleteBtn.classList.add("delete-button")
-      deleteBtn.setAttribute("data-handler", "deleteChecklist")
+      const deleteBtn = document.createElement('button')
+      deleteBtn.classList.add('delete-button')
+      deleteBtn.setAttribute('data-handler', 'deleteChecklist')
       label.appendChild(deleteBtn)
       this.checklist.appendChild(label)
 
-      this.self.inputChecklist.value = ""
+      this.self.inputChecklist.value = ''
     },
     deleteChecklist (args = {}) {
-      const closestLabel = event.target.closest("[data-checklist]")
+      const closestLabel = args.event.target.closest('[data-checklist]')
       this.checklist.removeChild(closestLabel)
     },
     setSelectOption () {
       Array.from(this.project.children).forEach(oldOption => this.project.removeChild(oldOption))
 
       for (let i = 0; i < projectList.length; i++) {
-        let newOption = document.createElement("option")
+        const newOption = document.createElement('option')
         newOption.textContent = projectList[i].name
-        
-        if (projectList[i].selected) newOption.setAttribute("selected", true)
+
+        if (projectList[i].selected) newOption.setAttribute('selected', true)
 
         this.project.appendChild(newOption)
       }
@@ -270,51 +261,46 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
   }
 
   const formFactory = function (index) {
-// this refers to object representing form, this.self refers to DOM element of form
+    // this refers to object representing form, this.self refers to DOM element of form
 
     function _setProp (element) {
       if (element.name in obj) {
-        if (obj[element.name] instanceof Array) { 
+        if (obj[element.name] instanceof Array) {
           obj[element.name].push(element)
         } else {
           obj[element.name] = [obj[element.name], element]
         }
-      } else if (!element.classList.contains("no-form")) {
+      } else if (!element.classList.contains('no-form')) {
         obj[element.name] = element
       }
     }
 
-
     const obj = {}
     obj.index = index
     obj.self = document.forms[index]
-    obj.background = document.querySelector(`.background-form[data-path="forms,${index}"]`)
+    obj.background = document.querySelector(`.background-form[data-path='forms,${index}']`)
     Array.from(obj.self.elements).forEach(element => _setProp(element))
-    
 
     if (index === 1) {
-      obj.checklist = document.getElementById("checklist-form-div")
-      obj.self.inputChecklist = document.getElementById("checklist-input-form")
+      obj.checklist = document.getElementById('checklist-form-div')
+      obj.self.inputChecklist = document.getElementById('checklist-input-form')
     }
 
     return Object.assign(Object.create(protoForm), obj)
   }
 
-
   const orderArray = (array) => {
     let orderFunc
 
-    if (array[0] && array[0].dueDate) { 
-      orderFunc = function (lastElem, nextElem) { 
+    if (array[0] && array[0].dueDate) {
+      orderFunc = function (lastElem, nextElem) {
         return compareAsc(new Date(lastElem.dueDate), new Date(nextElem.dueDate))
       }
     }
-    
-
 
     array.sort((lastElem, nextElem) => {
       return orderFunc(lastElem, nextElem)
-    }) 
+    })
     return array
   }
 
@@ -327,15 +313,14 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     const project = projectList.find(x => x.name === nameProject)
 
     if (!project) {
-      forms[0].addToList({newObj: projectFactory({name: nameProject, dueDate: newObj.dueDate, isDone: newObj.isDone})})
-      return projectList[projectList.length -1].todoList
+      forms[0].addToList({ newObj: projectFactory({ name: nameProject, dueDate: newObj.dueDate, isDone: newObj.isDone }) })
+      return projectList[projectList.length - 1].todoList
     } else {
       return project.todoList
     }
   }
 
-
-// method has to be called in string
+  // method has to be called in string
   const updateWrap = (obj, objMethod, ...args) => {
     if (obj && obj[objMethod] instanceof Function) obj[objMethod](...args)
 
@@ -344,14 +329,14 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     displayAll(projectList)
   }
 
-  const clickHandler = () => {
+  const clickHandler = (event) => {
     const target = event.target
-    let closestHandler = target.closest("[data-handler]")
+    let closestHandler = target.closest('[data-handler]')
     if (closestHandler) closestHandler = closestHandler.dataset.handler
-    let _path = target.closest("[data-path]")
-    
+    let _path = target.closest('[data-path]')
+
     if (_path) {
-      _path = _path.dataset.path.split(",")
+      _path = _path.dataset.path.split(',')
       const element = findPath(..._path)
 
       const args = {
@@ -360,7 +345,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
         self: element.self
       }
 
-      if (element.self[closestHandler]) return  updateWrap(element.self, closestHandler, args)
+      if (element.self[closestHandler]) return updateWrap(element.self, closestHandler, args)
     }
   }
 
@@ -368,7 +353,7 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     let parent
     let self
 
-    if (project === "forms") {
+    if (project === 'forms') {
       parent = forms
       self = parent[todo]
 
@@ -377,16 +362,16 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     switch (arguments.length) {
       case 1:
         parent = projectList
-        break;
+        break
       case 2:
         parent = projectList[project].todoList
-        break;
+        break
       case 3:
         parent = projectList[project].todoList[todo].checklist
-        break;
+        break
     }
     self = parent[arguments[arguments.length - 1]]
-    
+
     return { self, parent }
   }
 
@@ -394,12 +379,11 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
     forms.push(formFactory(0))
     forms.push(formFactory(1))
 
-    if(!localStorage.length) {
-      const dueDate = new Date(add(new Date(), {weeks: 1}))
-      forms[1].addToList({ newObj: todoFactory({name: "Fill Todo App", description: "Fill this Todo App so it can assist me in my busy life.", dueDate, priority: "medium", notes: "Very Important.", checklist: [{name:"first item", isChecked: true}, {name: "second item", isChecked: false}, {name: "third item", isChecked: true}, {name: "fourth item", isChecked: false}], isDone: false}), project: "default"})  
-      forms[1].addToList({ newObj: todoFactory({name: "Past Todo", description: "Todos look like this when their due date is in the past.", dueDate: new Date(1999, 12, 31), priority: "low", isDone: false}), project: "default"})  
-      forms[1].addToList({ newObj: todoFactory({name: "Today Todo", description: "Todos look like this when their due date is the present day.", dueDate: new Date(), priority: "high", isDone: false}), project: "default"})  
-
+    if (!localStorage.length) {
+      const dueDate = new Date(add(new Date(), { weeks: 1 }))
+      forms[1].addToList({ newObj: todoFactory({ name: 'Fill Todo App', description: 'Fill this Todo App so it can assist me in my busy life.', dueDate, priority: 'medium', notes: 'Very Important.', checklist: [{ name: 'first item', isChecked: true }, { name: 'second item', isChecked: false }, { name: 'third item', isChecked: true }, { name: 'fourth item', isChecked: false }], isDone: false }), project: 'default' })
+      forms[1].addToList({ newObj: todoFactory({ name: 'Past Todo', description: 'Todos look like this when their due date is in the past.', dueDate: new Date(1999, 12, 31), priority: 'low', isDone: false }), project: 'default' })
+      forms[1].addToList({ newObj: todoFactory({ name: 'Today Todo', description: 'Todos look like this when their due date is the present day.', dueDate: new Date(), priority: 'high', isDone: false }), project: 'default' })
     } else {
       retrieveStorage().forEach(item => projectList.push(item))
       projectList.forEach(project => Object.setPrototypeOf(project, proto))
@@ -407,18 +391,8 @@ console.log(formatDistanceToNow((new Date()), { addSuffix: true }))
       projectList.forEach(project => project.todoList.forEach(todo => todo.setPrototypeOfChildren()))
     }
     updateWrap()
-    document.addEventListener("click", clickHandler)
+    document.addEventListener('click', () => clickHandler(event))
   }
 
   init()
-
-  console.log("projectList:")
-  console.log(projectList)
-
-  console.log("forms:")
-  console.log(forms)
-
-
-  // return init()
-
 })()
