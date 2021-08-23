@@ -380,7 +380,7 @@ import { displayAll } from './display-controller.js'
     forms.push(formFactory(0))
     forms.push(formFactory(1))
 
-    if (!localStorage.length) {
+    if (!('todoApp' in localStorage)) {
       const dueDate = new Date(add(new Date(), { weeks: 1 }))
       forms[1].addToList({ newObj: todoFactory({ name: 'Fill Todo App', description: 'Fill this Todo App so it can assist me in my busy life.', dueDate, priority: 'medium', notes: 'Very Important.', checklist: [{ name: 'first item', isChecked: true }, { name: 'second item', isChecked: false }, { name: 'third item', isChecked: true }, { name: 'fourth item', isChecked: false }], isDone: false }), project: 'default' })
       forms[1].addToList({ newObj: todoFactory({ name: 'Past Todo', description: 'Todos look like this when their due date is in the past.', dueDate: new Date(1999, 12, 31), priority: 'low', isDone: false }), project: 'default' })
