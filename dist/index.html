@@ -1,8 +1,111 @@
 
 <head>
-  <title>Leau's Todo App</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>organize.io</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap" rel="stylesheet">
 <script defer src="index.bundle.js"></script></head>
 <body>
-  <h1>hi</h1>
-  <p>this is a test</p>
+
+  <div class="header">
+    <h1>Organize your life</h1>
+  </div>
+<div id="main-container">
+  <div id="project-container">
+  </div>
+
+
+  <div id="todo-container">
+  </div>
+</div>
+
+  <button class="add-button" data-path="forms,0" data-handler="show">New Project</button>
+  <button id="add-button-todo" class="add-button" data-path="forms,1" data-handler="show">New Todo</button>
+
+  <form id="project-form" class="add-forms visually-hidden" data-path="forms,0">
+<label>Enter the title of your Project :
+  <input type="text" name="name" required>
+</label>
+<label>When is this Project due?
+  <input class="date-input" name="date" type="date" required>
+  <input class="time-input" name="time" type="time" value="18:00" required>
+</label>
+
+<div class="div-radio">
+  <label class="main-label">Did you finish what you had to do for this Project?
+  </label>
+  <label for="done-project-false" class="radio-label">No</label>
+  <input name="isDone" class="radio-input" type="radio" value=false id="done-project-false" checked=true>
+  <label for="done-project-true" class="radio-label">Yes</label>
+  <input name="isDone" class="radio-input" type="radio" value=true id="done-project-true">
+</div>
+
+  <input type="button" value="X" class="close-form-btn no-form" data-path="forms,0" data-handler="close">
+
+  <input type="submit" name="submit" class="submit-form no-form" id="submit-project-form" data-handler="submit">
+</form>
+
+<div class="background-form visually-hidden"  data-path="forms,0" data-handler="close"></div>
+<div class="background-form visually-hidden" data-path="forms,1" data-handler="close"></div>
+
+<form id="todo-form" class="add-forms visually-hidden" data-path="forms,1">
+  <label>Enter the title of your Todo :
+    <input type="text" name="name" required>
+  </label>
+  <label>Enter a description of your Todo :
+    <textarea style="resize: none;" rows=3 name="description"></textarea>
+  </label>
+
+  <label>When is this Todo due?
+    <input class="date-input" name="date" type="date"  required>
+    <input class="time-input" name="time" type="time" value="20:00" required>
+  </label>
+  
+<label>For which Project is this Todo?
+  <select name="project">
+  </select>
+</label>
+
+<div class="div-radio">
+  <label class="main-label">What is the priority of this Todo?
+  </label>
+    <label for="priority-todo-high" class="radio-label">High</label>
+    <input name="priority" class="radio-input" type="radio" value="high" id="priority-todo-high">
+    <label for="priority-todo-medium" class="radio-label">Medium</label>
+    <input name="priority" class="radio-input" type="radio" value="medium" id="priority-todo-medium" checked=true>
+    <label for="priority-todo-low" class="radio-label">Low</label>
+    <input name="priority" class="radio-input" type="radio" value="low" id="priority-todo-low">
+  </div>
+
+    <label>Do you have notes to keep for this Todo ?
+      <textarea name="notes" style="resize: none;" rows=2></textarea>
+    </label>
+<div class="div-radio">
+  <label class="main-label">Did you finish what you had to do for this Todo?
+  </label>
+    <label for="done-todo-false" class="radio-label">No</label>
+    <input name="isDone" class="radio-input " type="radio" value=false id="done-todo-false" checked=true>
+    <label for="done-todo-true" class="radio-label">Yes</label>
+    <input name="isDone" class="radio-input" type="radio" value=true id="done-todo-true">
+  </div>
+  
+    <label>Insert a Checklist item in this Todo?
+      <input type="text" class="no-form" id="checklist-input-form">
+      <button id="add-checklist-button" value="add" class="no-form" data-handler="addChecklist">Add</button>
+      <div id="checklist-form-div">
+      </div>
+    </label>
+
+    <input type="button" value="X" class="close-form-btn no-form" data-path="forms,1" data-handler="close">
+  
+    <input type="submit" name="submit" class="submit-form no-form" id="submit-todo-form" data-handler="submit" class="no-form">
+</form>
+
+<div class="footer">
+<a href="../README.md">README</a>
+<a href="#/">GitHub</a>
+</div>
+
 </body>
