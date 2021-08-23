@@ -326,7 +326,7 @@ import { displayAll } from './display-controller.js'
     if (obj && obj[objMethod] instanceof Function) obj[objMethod](...args)
 
     orderAllArrays()
-    updateStorage(projectList, "todoApp")
+    updateStorage(projectList, 'todoApp')
     displayAll(projectList)
   }
 
