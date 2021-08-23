@@ -175,7 +175,8 @@ import { displayAll } from './display-controller.js'
       const requiredInputs = ['name', 'date', 'time']
 
       return requiredInputs.every(inputName => {
-        if (inputName === 'date' && !isExists(...(this.date.value.split('-')))) return false
+        const dateArray = this.date.value.split('-').map(numberAsString => Number(numberAsString))
+        if (inputName === 'date' && dateArray.length === 3 && !isExists(...dateArray)) return false
         return this[inputName].checkValidity()
       })
     },
@@ -325,7 +326,7 @@ import { displayAll } from './display-controller.js'
     if (obj && obj[objMethod] instanceof Function) obj[objMethod](...args)
 
     orderAllArrays()
-    updateStorage(projectList)
+    updateStorage(projectList, "todoApp")
     displayAll(projectList)
   }
 
@@ -385,7 +386,7 @@ import { displayAll } from './display-controller.js'
       forms[1].addToList({ newObj: todoFactory({ name: 'Past Todo', description: 'Todos look like this when their due date is in the past.', dueDate: new Date(1999, 12, 31), priority: 'low', isDone: false }), project: 'default' })
       forms[1].addToList({ newObj: todoFactory({ name: 'Today Todo', description: 'Todos look like this when their due date is the present day.', dueDate: new Date(), priority: 'high', isDone: false }), project: 'default' })
     } else {
-      retrieveStorage().forEach(item => projectList.push(item))
+      retrieveStorage('todoApp').forEach(item => projectList.push(item))
       projectList.forEach(project => Object.setPrototypeOf(project, proto))
       projectList.forEach(project => project.setPrototypeOfChildren())
       projectList.forEach(project => project.todoList.forEach(todo => todo.setPrototypeOfChildren()))

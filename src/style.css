@@ -383,11 +383,17 @@ input[type="text"]:focus, textarea:focus, select:focus, option:focus, input[type
   height: 100px;
   width: 100%;
   color: white;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .header h1 {
   text-align: center;
+}
+
+.header p {
+  text-align: center;
+  font-style: italic;
+  margin-top: -35px;
 }
 
 .footer {

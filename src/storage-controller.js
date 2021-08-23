@@ -1,21 +1,11 @@
-function updateStorage(array) {
-  localStorage.clear();
+function updateStorage(array, whichApp) {
+  delete localStorage[whichApp]
 
-  array.forEach((element, index) => {
-    localStorage.setItem(("element" + index), JSON.stringify(array[index]));
-  });
+  localStorage[whichApp] = JSON.stringify(array)
 }
 
-function retrieveStorage() {
-  const storageLen = localStorage.length;
-
-  const array = []
-
-  for (let i = 0; i < storageLen; i++) {
-    array.push(JSON.parse(localStorage.getItem("element" + i)));
-  }
-
-  return array
+function retrieveStorage(whichApp) {
+  return JSON.parse(localStorage[whichApp])
 }
 
 
