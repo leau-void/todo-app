@@ -2,14 +2,10 @@
   font-size: 100%;
 }
 
-html {
-  width: 100%;
-  background: linear-gradient(45deg, red, blue);
-  font-family: "Ubuntu", sans-serif;
-}
-
 body {
-  min-height: 600px;
+  font-family: "Ubuntu", sans-serif;
+  background: #916bbf;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   z-index: 98;
@@ -387,6 +383,7 @@ input[type="date"]:focus {
 }
 
 .header {
+  position: relative;
   height: 15vh;
   width: 100%;
   color: #dcbade;
@@ -457,7 +454,6 @@ input[type="date"]:focus {
 
 @media (max-height: 500px) and (orientation: landscape) {
   body {
-    min-height: unset;
     max-height: 100vh;
   }
 
