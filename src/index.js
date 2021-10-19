@@ -12,24 +12,77 @@ import {
   isExists,
 } from "date-fns";
 import { displayAll } from "./display-controller.js";
-import { getAuth, signInAnonymously } from "firebase/auth";
-import app from "./firebase-config";
+import {
+  getAuth,
+  signOut,
+  signInWithPopup,
+  signInAnonymously,
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { doc, getDoc, setDoc, addDoc, collection } from "firebase/firestore";
+import { app, db } from "./firebase-config";
 
 /* global alert localStorage event */
 
-function checkSignedIn() {
+const authPage = document.querySelector(".auth-page");
+
+function isSignedIn() {
   return !!getAuth().currentUser;
 }
 
-async function signIn() {}
+onAuthStateChanged(getAuth(), async (user) => {
+  if (!user) return signInFlow();
+  let docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    console.log("yes");
+    console.log(user.uid);
+  } else {
+    try {
+      docRef = setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        projectList: [],
+      });
+      console.log(docRef.id);
+    } catch (err) {
+      console.error("error creating doc", err);
+    }
+  }
+});
+
+async function signInUser(loginType) {
+  const auth = getAuth();
+  if (loginType === "anon") await signInAnonymously(auth);
+  else {
+    const provider = new (
+      loginType === "fb" ? FacebookAuthProvider : GoogleAuthProvider
+    )();
+    await signInWithPopup(auth, provider);
+  }
+  return isSignedIn();
+}
+
+async function handleSignInButton(e) {
+  const login = e.target.dataset.login;
+  if (!login) return;
+  if (await signInUser(login)) {
+    authPage.classList.add("hidden");
+    authPage.removeEventListener("click", handleSignInButton);
+  }
+}
+
+async function signInFlow() {
+  authPage.classList.remove("hidden");
+  authPage.addEventListener("click", handleSignInButton);
+}
+
+function signOutUser() {
+  signOut(getAuth());
+}
 
 (() => {
-  if (checkSignedIn()) {
-  } else {
-    const authPage = document.querySelector(".auth-page");
-    authPage.classList.remove("hidden");
-  }
-
   const projectList = [];
   const forms = [];
 

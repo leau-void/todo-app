@@ -16,15 +16,24 @@
 }
 
 .login-buttons-container {
-  height: 30vh;
+  height: 20vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 }
 
+[data-login] {
+  border: 0;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
 .fb-login-button {
   width: 247px;
+  height: 40px;
+  background: center url(./fb-login-button.png);
+  background-size: 253px 40px;
 }
 
 .google-login-button {
@@ -32,8 +41,6 @@
   height: 55px;
   background: center url(./google-login-button.png);
   background-size: 253px 55px;
-  border: 0;
-  cursor: pointer;
 }
 
 .anonymous-login-button {
@@ -44,7 +51,4 @@
   font-family: "Ubuntu", sans-serif;
   font-size: 1.2rem;
   font-weight: 600;
-  border: 0;
-  border-radius: 3px;
-  cursor: pointer;
 }
