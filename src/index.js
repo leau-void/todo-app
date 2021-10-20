@@ -1,5 +1,4 @@
 import "./styles";
-import { updateStorage, retrieveStorage } from "./storage-controller.js";
 import {
   formatDistanceToNow,
   add,
