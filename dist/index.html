@@ -10,24 +10,87 @@
       href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap"
       rel="stylesheet"
     />
+    <script type="text/javascript">
+      !(function (n, e) {
+        var t,
+          o,
+          i,
+          c = [],
+          f = { passive: !0, capture: !0 },
+          r = new Date(),
+          a = "pointerup",
+          u = "pointercancel";
+        function p(n, c) {
+          t || ((t = c), (o = n), (i = new Date()), w(e), s());
+        }
+        function s() {
+          o >= 0 &&
+            o < i - r &&
+            (c.forEach(function (n) {
+              n(o, t);
+            }),
+            (c = []));
+        }
+        function l(t) {
+          if (t.cancelable) {
+            var o =
+              (t.timeStamp > 1e12 ? new Date() : performance.now()) -
+              t.timeStamp;
+            "pointerdown" == t.type
+              ? (function (t, o) {
+                  function i() {
+                    p(t, o), r();
+                  }
+                  function c() {
+                    r();
+                  }
+                  function r() {
+                    e(a, i, f), e(u, c, f);
+                  }
+                  n(a, i, f), n(u, c, f);
+                })(o, t)
+              : p(o, t);
+          }
+        }
+        function w(n) {
+          [
+            "click",
+            "mousedown",
+            "keydown",
+            "touchstart",
+            "pointerdown",
+          ].forEach(function (e) {
+            n(e, l, f);
+          });
+        }
+        w(n),
+          (self.perfMetrics = self.perfMetrics || {}),
+          (self.perfMetrics.onFirstInputDelay = function (n) {
+            c.push(n), s();
+          });
+      })(addEventListener, removeEventListener);
+    </script>
   <script defer src="index.bundle.js"></script></head>
   <body>
     <header class="header">
       <h1>organize it</h1>
       <p>Timing is everything</p>
-      <button class="login-button hidden">Log in</button>
-      <button onclick="window.signOutUser()" class="logout-button">
-        Log out
-      </button>
     </header>
+    <div class="login-flow">
+      <div class="login-name"></div>
+      <button class="login-button hidden">Log in</button>
+      <button class="logout-button">Log out</button>
+    </div>
 
     <div class="auth-page hidden">
-      <div class="login-buttons-container">
-        <button data-login="fb" class="fb-login-button"></button>
-        <button data-login="google" class="google-login-button"></button>
-        <button data-login="anon" class="anonymous-login-button">
-          Log in as Guest
-        </button>
+      <div class="auth-page-bg">
+        <div class="login-buttons-container">
+          <button data-login="fb" class="fb-login-button"></button>
+          <button data-login="google" class="google-login-button"></button>
+          <button data-login="anon" class="anonymous-login-button">
+            Log in as Guest
+          </button>
+        </div>
       </div>
     </div>
 

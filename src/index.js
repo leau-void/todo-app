@@ -1,6 +1,4 @@
-import "./normalize.css";
-import "./style.css";
-import "./auth-page.css";
+import "./styles";
 import { updateStorage, retrieveStorage } from "./storage-controller.js";
 import {
   formatDistanceToNow,
@@ -23,42 +21,26 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { app, db } from "./firebase-config";
+import { getPerformance } from "firebase/performance";
 
 /* global alert localStorage event */
 
-const authPage = document.querySelector(".auth-page");
-const projectList = [];
-const forms = [];
-
-let unsubSnapshotListener;
-
-onAuthStateChanged(getAuth(), async (user) => {
-  if (!user) return signInFlow();
-  toggleLoginButton(user);
-  const docRef = doc(db, "users", user.uid);
-  const docSnap = await getDoc(docRef);
-
-  //unsub from old user
-  if (unsubSnapshotListener) unsubSnapshotListener();
-  setupSnapshotListener(docRef);
-
-  if (!docSnap.exists()) {
-    try {
-      await setDoc(docRef, {
-        uid: user.uid,
-        displayName: user.displayName,
-        projectList: [],
-      });
-    } catch (err) {
-      console.error("error creating doc", err);
-    }
-  }
-});
-
-function setupSnapshotListener(docRef) {
+function setupSnapshotListener() {
   unsubSnapshotListener = onSnapshot(docRef, (newDoc) => {
-    const newProjectList = newDoc.data().projectList;
-    console.log(newProjectList);
+    projectList = [...newDoc.data().projectList];
+
+    resetPrototypes(projectList);
+    displayAll(projectList);
+  });
+}
+
+async function updateDB() {
+  await docRef;
+  const unCustomedProjects = projectList.map((project) =>
+    JSON.parse(JSON.stringify(project))
+  );
+  updateDoc(docRef, {
+    projectList: unCustomedProjects,
   });
 }
 
@@ -68,13 +50,15 @@ function isSignedIn() {
 
 function toggleLoginButton(user) {
   const button = document.querySelector(".login-button");
-  if (user.isAnonymous) button.classList.remove("hidden");
-  else button.classList.add("hidden");
-}
-
-function updateDB(ref) {
-  console.log(projectList);
-  // updateDoc(ref, {});
+  const nameDiv = document.querySelector(".login-name");
+  if (user.isAnonymous) {
+    button.classList.remove("hidden");
+    nameDiv.classList.add("hidden");
+  } else {
+    nameDiv.textContent = `Logged in as ${user.displayName}`;
+    nameDiv.classList.remove("hidden");
+    button.classList.add("hidden");
+  }
 }
 
 async function signInUser(loginType) {
@@ -104,10 +88,9 @@ async function signInFlow() {
   authPage.addEventListener("click", handleSignInButton);
 }
 
-window.signOutUser = () => {
-  console.log("signout");
+function signOutUser() {
   signOut(getAuth());
-};
+}
 
 const proto = {
   toggleBoolean(prop) {
@@ -352,7 +335,6 @@ const protoForm = {
         Array.from(this.checklist.children).forEach((checkboxLabel) => {
           const checklistObj = {};
           checklistObj.name = checkboxLabel.textContent;
-          // Now they take X of child node into the textContent with add todo or edit, but will fix when changed to an image
           checklistObj.isChecked = checkboxLabel.children[0].checked;
 
           arrayCheckListObj.push(checklistObj);
@@ -401,7 +383,7 @@ const protoForm = {
   },
 };
 
-const formFactory = function (index) {
+function formFactory(index) {
   // this refers to object representing form, this.self refers to DOM element of form
 
   function _setProp(element) {
@@ -430,7 +412,7 @@ const formFactory = function (index) {
   }
 
   return Object.assign(Object.create(protoForm), obj);
-};
+}
 
 const orderArray = (array) => {
   let orderFunc;
@@ -474,8 +456,8 @@ const updateWrap = (obj, objMethod, ...args) => {
   if (obj && obj[objMethod] instanceof Function) obj[objMethod](...args);
 
   orderAllArrays();
-  updateStorage(projectList, "todoApp");
-  displayAll(projectList);
+
+  updateDB();
 };
 
 const clickHandler = (event) => {
@@ -525,60 +507,97 @@ function findPath(project, todo, check) {
   return { self, parent };
 }
 
-const init = () => {
-  forms.push(formFactory(0));
-  forms.push(formFactory(1));
+function initNewUser() {
+  const dueDate = new Date(add(new Date(), { weeks: 1 }));
+  forms[1].addToList({
+    newObj: todoFactory({
+      name: "Fill Todo App",
+      description: "Fill this Todo App so it can assist me in my busy life.",
+      dueDate,
+      priority: "medium",
+      notes: "Very Important.",
+      checklist: [
+        { name: "first item", isChecked: true },
+        { name: "second item", isChecked: false },
+        { name: "third item", isChecked: true },
+        { name: "fourth item", isChecked: false },
+      ],
+      isDone: false,
+    }),
+    project: "default",
+  });
+  forms[1].addToList({
+    newObj: todoFactory({
+      name: "Past Todo",
+      description: "Todos look like this when their due date is in the past.",
+      dueDate: new Date(1999, 12, 31),
+      priority: "low",
+      isDone: false,
+    }),
+    project: "default",
+  });
+  forms[1].addToList({
+    newObj: todoFactory({
+      name: "Today Todo",
+      description:
+        "Todos look like this when their due date is the present day.",
+      dueDate: new Date(),
+      priority: "high",
+      isDone: false,
+    }),
+    project: "default",
+  });
+}
 
-  if (!("todoApp" in localStorage)) {
-    const dueDate = new Date(add(new Date(), { weeks: 1 }));
-    forms[1].addToList({
-      newObj: todoFactory({
-        name: "Fill Todo App",
-        description: "Fill this Todo App so it can assist me in my busy life.",
-        dueDate,
-        priority: "medium",
-        notes: "Very Important.",
-        checklist: [
-          { name: "first item", isChecked: true },
-          { name: "second item", isChecked: false },
-          { name: "third item", isChecked: true },
-          { name: "fourth item", isChecked: false },
-        ],
-        isDone: false,
-      }),
-      project: "default",
-    });
-    forms[1].addToList({
-      newObj: todoFactory({
-        name: "Past Todo",
-        description: "Todos look like this when their due date is in the past.",
-        dueDate: new Date(1999, 12, 31),
-        priority: "low",
-        isDone: false,
-      }),
-      project: "default",
-    });
-    forms[1].addToList({
-      newObj: todoFactory({
-        name: "Today Todo",
-        description:
-          "Todos look like this when their due date is the present day.",
-        dueDate: new Date(),
-        priority: "high",
-        isDone: false,
-      }),
-      project: "default",
-    });
-  } else {
-    retrieveStorage("todoApp").forEach((item) => projectList.push(item));
-    projectList.forEach((project) => Object.setPrototypeOf(project, proto));
-    projectList.forEach((project) => project.setPrototypeOfChildren());
-    projectList.forEach((project) =>
-      project.todoList.forEach((todo) => todo.setPrototypeOfChildren())
-    );
+function resetPrototypes(list) {
+  list.forEach((project) => Object.setPrototypeOf(project, proto));
+  list.forEach((project) => project.setPrototypeOfChildren());
+  list.forEach((project) =>
+    project.todoList.forEach((todo) => todo.setPrototypeOfChildren())
+  );
+}
+
+document.querySelector(".logout-button").addEventListener("click", signOutUser);
+
+const authPage = document.querySelector(".auth-page");
+let projectList = [];
+const forms = [];
+
+forms.push(formFactory(0));
+forms.push(formFactory(1));
+
+let unsubSnapshotListener;
+let docRef;
+
+document.addEventListener("click", () => clickHandler(event));
+getPerformance();
+
+onAuthStateChanged(getAuth(), async (user) => {
+  //unsub from old user
+  if (unsubSnapshotListener) unsubSnapshotListener();
+
+  //clear projectList
+  projectList = [];
+
+  if (!user) return signInFlow();
+  toggleLoginButton(user);
+  docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+
+  //sub to new user
+  setupSnapshotListener();
+
+  if (!docSnap.exists()) {
+    try {
+      await setDoc(docRef, {
+        uid: user.uid,
+        displayName: user.displayName,
+        projectList: [],
+      });
+      initNewUser();
+      updateWrap();
+    } catch (err) {
+      console.error("error creating doc", err);
+    }
   }
-  updateWrap();
-  document.addEventListener("click", () => clickHandler(event));
-};
-
-init();
+});

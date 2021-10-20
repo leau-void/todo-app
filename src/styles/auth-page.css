@@ -1,26 +1,29 @@
+.login-flow {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0.5rem 0;
+}
+
+.login-name {
+}
+
 .login-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   border: 0;
   background: #c996cc;
   padding: 0.5rem;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .logout-button {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
   border: 0;
   background: #c996cc;
   padding: 0.5rem;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .auth-page {
-  height: 85vh;
-  top: 15vh;
+  height: 100vh;
+  top: 0;
   position: fixed;
   z-index: 99;
   background: rgba(255, 255, 255, 0.5);
@@ -29,6 +32,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.auth-page-bg {
 }
 
 .hidden {
@@ -52,14 +58,14 @@
 .fb-login-button {
   width: 247px;
   height: 40px;
-  background: center url(./fb-login-button.png);
+  background: center url(../assets/fb-login-button.png);
   background-size: 253px 40px;
 }
 
 .google-login-button {
   width: 253px;
   height: 55px;
-  background: center url(./google-login-button.png);
+  background: center url(../assets/google-login-button.png);
   background-size: 253px 55px;
 }
 
