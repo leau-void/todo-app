@@ -21,12 +21,46 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { app, db } from "./firebase-config";
 
 /* global alert localStorage event */
 
 const authPage = document.querySelector(".auth-page");
+const projectList = [];
+const forms = [];
+
+let unsubSnapshotListener;
+
+onAuthStateChanged(getAuth(), async (user) => {
+  if (!user) return signInFlow();
+  toggleLoginButton(user);
+  const docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+
+  //unsub from old user
+  if (unsubSnapshotListener) unsubSnapshotListener();
+  setupSnapshotListener(docRef);
+
+  if (!docSnap.exists()) {
+    try {
+      await setDoc(docRef, {
+        uid: user.uid,
+        displayName: user.displayName,
+        projectList: [],
+      });
+    } catch (err) {
+      console.error("error creating doc", err);
+    }
+  }
+});
+
+function setupSnapshotListener(docRef) {
+  unsubSnapshotListener = onSnapshot(docRef, (newDoc) => {
+    const newProjectList = newDoc.data().projectList;
+    console.log(newProjectList);
+  });
+}
 
 function isSignedIn() {
   return !!getAuth().currentUser;
@@ -42,27 +76,6 @@ function updateDB(ref) {
   console.log(projectList);
   // updateDoc(ref, {});
 }
-
-onAuthStateChanged(getAuth(), async (user) => {
-  if (!user) return signInFlow();
-  toggleLoginButton(user);
-  const docRef = doc(db, "users", user.uid);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) {
-    try {
-      await setDoc(docRef, {
-        uid: user.uid,
-        displayName: user.displayName,
-        projectList: [],
-      });
-    } catch (err) {
-      console.error("error creating doc", err);
-    }
-  }
-  // window.setInterval(() => {
-  //   updateDB(docRef);
-  // }, 5000);
-});
 
 async function signInUser(loginType) {
   const auth = getAuth();
@@ -95,9 +108,6 @@ window.signOutUser = () => {
   console.log("signout");
   signOut(getAuth());
 };
-
-const projectList = [];
-const forms = [];
 
 const proto = {
   toggleBoolean(prop) {
