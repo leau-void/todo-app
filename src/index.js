@@ -47,16 +47,20 @@ function isSignedIn() {
   return !!getAuth().currentUser;
 }
 
-function toggleLoginButton(user) {
-  const button = document.querySelector(".login-button");
-  const nameDiv = document.querySelector(".login-name");
+function handleSigninButton() {}
+
+function toggleSigninButton(user) {
+  const button = document.querySelector(".signin-button");
+  const nameDiv = document.querySelector(".auth-name");
   if (user.isAnonymous) {
     button.classList.remove("hidden");
     nameDiv.classList.add("hidden");
+    button.addEventListener("click", handleSigninButton);
   } else {
     nameDiv.textContent = `Logged in as ${user.displayName}`;
     nameDiv.classList.remove("hidden");
     button.classList.add("hidden");
+    button.removeEventListener("click", handleSigninButton);
   }
 }
 
@@ -73,18 +77,18 @@ async function signInUser(loginType) {
   return isSignedIn();
 }
 
-async function handleSignInButton(e) {
+async function handleLoginButtons(e) {
   const login = e.target.dataset.login;
   if (!login) return;
   if (await signInUser(login)) {
     authPage.classList.add("hidden");
-    authPage.removeEventListener("click", handleSignInButton);
+    authPage.removeEventListener("click", handleLoginButtons);
   }
 }
 
 async function signInFlow() {
   authPage.classList.remove("hidden");
-  authPage.addEventListener("click", handleSignInButton);
+  authPage.addEventListener("click", handleLoginButtons);
 }
 
 function signOutUser() {
@@ -579,7 +583,7 @@ onAuthStateChanged(getAuth(), async (user) => {
   projectList = [];
 
   if (!user) return signInFlow();
-  toggleLoginButton(user);
+  toggleSigninButton(user);
   docRef = doc(db, "users", user.uid);
   const docSnap = await getDoc(docRef);
 

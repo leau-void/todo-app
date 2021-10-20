@@ -76,20 +76,35 @@
       <h1>organize it</h1>
       <p>Timing is everything</p>
     </header>
-    <div class="login-flow">
-      <div class="login-name"></div>
-      <button class="login-button hidden">Log in</button>
-      <button class="logout-button">Log out</button>
+    <div class="auth-flow">
+      <div class="auth-name"></div>
+      <button class="signin-button hidden log-button">Sign in</button>
+      <button class="logout-button log-button">Log out</button>
     </div>
 
     <div class="auth-page hidden">
-      <div class="auth-page-bg">
-        <div class="login-buttons-container">
-          <button data-login="fb" class="fb-login-button"></button>
-          <button data-login="google" class="google-login-button"></button>
-          <button data-login="anon" class="anonymous-login-button">
-            Log in as Guest
-          </button>
+      <header class="header">
+        <h1>organize it</h1>
+        <p>Timing is everything</p>
+      </header>
+      <div class="login-buttons-container">
+        <button data-login="fb" class="fb-login-button"></button>
+        <button data-login="google" class="google-login-button"></button>
+        <button data-login="anon" class="anonymous-login-button">
+          Continue as Guest
+        </button>
+      </div>
+      <div class="login-text">
+        <div>
+          Feel free to continue as a guest, your data will still be saved, but
+          will only be accessible from this device.
+        </div>
+        <div>
+          You can later link your data to an account to access it from anywhere!
+        </div>
+        <div>
+          Make sure to not click the "Log Out" button while logged in as a
+          Guest, unless you want to delete that Guest account.
         </div>
       </div>
     </div>
