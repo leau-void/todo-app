@@ -29,7 +29,6 @@ cd todo-app
 npm install
 firebase serve --only hosting
 npx webpack --watch
-
 ```
 
 ## Built With
