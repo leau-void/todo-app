@@ -54,12 +54,17 @@ async function linkAccounts(loginType) {
 
   let credential;
 
-  await signInAnonymously(auth).then((result) => {
-    const provider = new (
-      loginType === "fb" ? FacebookAuthProvider : GoogleAuthProvider
-    )();
-    return linkWithPopup(auth.currentUser, provider);
-  });
+  // const signedIn = await signInAnonymously(auth).then((result) => {
+  //   const provider = new (
+  //     loginType === "fb" ? FacebookAuthProvider : GoogleAuthProvider
+  //   )();
+  //   return linkWithPopup(auth.currentUser, provider);
+  // });
+  const provider = new (
+    loginType === "fb" ? FacebookAuthProvider : GoogleAuthProvider
+  )();
+  await linkWithPopup(auth.currentUser, provider);
+
   toggleSigninButton(getAuth().currentUser);
 }
 
@@ -556,7 +561,7 @@ function initNewUser() {
       ],
       isDone: false,
     }),
-    project: "default",
+    project: "Default Project",
   });
   forms[1].addToList({
     newObj: todoFactory({
@@ -566,7 +571,7 @@ function initNewUser() {
       priority: "low",
       isDone: false,
     }),
-    project: "default",
+    project: "Default Project",
   });
   forms[1].addToList({
     newObj: todoFactory({
@@ -577,7 +582,7 @@ function initNewUser() {
       priority: "high",
       isDone: false,
     }),
-    project: "default",
+    project: "Default Project",
   });
 }
 
@@ -633,5 +638,3 @@ onAuthStateChanged(getAuth(), async (user) => {
     }
   }
 });
-
-window.setTimeout(() => console.log(getAuth().currentUser), 3000);

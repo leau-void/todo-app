@@ -44,15 +44,22 @@ function displayConverter(inputObj = {}, indexes = []) {
 
   if (isSelected) {
     outputObj.children.push({
-      tag: "button",
-      classes: ["delete-button", "corner-button"],
-      attributes: [["data-handler", "deleteObj"]],
+      tag: "div",
+      classes: ["button-wrap"],
+      children: [
+        {
+          tag: "button",
+          classes: ["delete-button", "action-button"],
+          attributes: [["data-handler", "deleteObj"]],
+        },
+        {
+          tag: "button",
+          classes: ["edit-button", "action-button"],
+          attributes: [["data-handler", "editObj"]],
+        },
+      ],
     });
-    outputObj.children.push({
-      tag: "button",
-      classes: ["edit-button", "corner-button"],
-      attributes: [["data-handler", "editObj"]],
-    });
+
     outputObj.classes.push("selected");
   }
 
