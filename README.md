@@ -19,7 +19,7 @@
 
 <a href="#preview">More screenshots</a>
 
-organize.it is a to-do list app, that let users them create projects, to-dos, and checklists. It saves all data to Firebase and so the users can recover them from session to session.
+*organize.it* is a to-do list app, that let users create and keep track of Projects, To-dos, and Checklists. It saves all data to Firebase and so the users can recover them from session to session.
 
 ## Getting started
 
