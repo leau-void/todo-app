@@ -124,7 +124,7 @@
       data-path="forms,1"
       data-handler="show"
     >
-      New Todo
+      New To-do
     </button>
 
     <form
@@ -132,6 +132,8 @@
       class="add-forms visually-hidden"
       data-path="forms,0"
     >
+      <div class="form-title">Add Project</div>
+
       <label
         >Enter the title of your Project :
         <input type="text" name="name" required />
@@ -148,7 +150,7 @@
         />
       </label>
 
-      <div class="div-radio">
+      <div class="div-radio div-radio-done">
         <label class="main-label"
           >Did you finish what you had to do for this Project?
         </label>
@@ -171,21 +173,25 @@
         />
       </div>
 
-      <input
-        type="button"
-        value="X"
-        class="close-form-btn no-form"
-        data-path="forms,0"
-        data-handler="close"
-      />
+      <div class="form-btns">
+        <button
+          class="close-form-btn no-form"
+          data-path="forms,0"
+          data-handler="close"
+        >
+          ⨯
+        </button>
 
-      <input
-        type="submit"
-        name="submit"
-        class="submit-form no-form"
-        id="submit-project-form"
-        data-handler="submit"
-      />
+        <button
+          type="submit"
+          name="submit"
+          class="submit-form no-form"
+          id="submit-project-form"
+          data-handler="submit"
+        >
+          ✓
+        </button>
+      </div>
     </form>
 
     <div
@@ -200,17 +206,18 @@
     ></div>
 
     <form id="todo-form" class="add-forms visually-hidden" data-path="forms,1">
+      <div class="form-title">Add To-do</div>
       <label
-        >Enter the title of your Todo :
+        >Enter the title of your To-do :
         <input type="text" name="name" required />
       </label>
       <label
-        >Enter a description of your Todo :
+        >Enter a description of your To-do :
         <textarea style="resize: none" rows="3" name="description"></textarea>
       </label>
 
       <label
-        >When is this Todo due?
+        >When is this To-do due?
         <input class="date-input" name="date" type="date" required />
         <input
           class="time-input"
@@ -222,12 +229,12 @@
       </label>
 
       <label
-        >For which Project is this Todo?
+        >For which Project is this To-do?
         <select name="project"></select>
       </label>
 
       <div class="div-radio">
-        <label class="main-label">What is the priority of this Todo? </label>
+        <label class="main-label">What is the priority of this To-do? </label>
         <label for="priority-todo-high" class="radio-label">High</label>
         <input
           name="priority"
@@ -256,12 +263,12 @@
       </div>
 
       <label
-        >Do you have notes to keep for this Todo ?
+        >Do you have notes to keep for this To-do ?
         <textarea name="notes" style="resize: none" rows="2"></textarea>
       </label>
-      <div class="div-radio">
+      <div class="div-radio div-radio-done">
         <label class="main-label"
-          >Did you finish what you had to do for this Todo?
+          >Did you finish what you had to do for this To-do?
         </label>
         <label for="done-todo-false" class="radio-label">No</label>
         <input
@@ -283,35 +290,42 @@
       </div>
 
       <label
-        >Insert a Checklist item in this Todo?
-        <input type="text" class="no-form" id="checklist-input-form" />
-        <button
-          id="add-checklist-button"
-          value="add"
-          class="no-form"
-          data-handler="addChecklist"
-        >
-          Add
-        </button>
+        >Insert a Checklist item in this To-do?
+        <div>
+          <input type="text" class="no-form" id="checklist-input-form" />
+          <button
+            id="add-checklist-button"
+            value="add"
+            class="no-form"
+            data-handler="addChecklist"
+          >
+            ✓
+          </button>
+        </div>
+
         <div id="checklist-form-div"></div>
       </label>
 
-      <input
-        type="button"
-        value="X"
-        class="close-form-btn no-form"
-        data-path="forms,1"
-        data-handler="close"
-      />
+      <div class="form-btns">
+        <button
+          class="close-form-btn no-form"
+          data-path="forms,1"
+          data-handler="close"
+        >
+          ⨯
+        </button>
 
-      <input
-        type="submit"
-        name="submit"
-        class="submit-form no-form"
-        id="submit-todo-form"
-        data-handler="submit"
-        class="no-form"
-      />
+        <button
+          type="submit"
+          name="submit"
+          class="submit-form no-form"
+          id="submit-todo-form"
+          data-handler="submit"
+          class="no-form"
+        >
+          ✓
+        </button>
+      </div>
     </form>
 
     <footer class="footer">

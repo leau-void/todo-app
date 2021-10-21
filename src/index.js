@@ -17,6 +17,8 @@ import {
   FacebookAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
+  linkWithCredential,
+  linkWithPopup,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { app, db } from "./firebase-config";
@@ -47,7 +49,34 @@ function isSignedIn() {
   return !!getAuth().currentUser;
 }
 
-function handleSigninButton() {}
+async function linkAccounts(loginType) {
+  const auth = getAuth();
+
+  let credential;
+
+  await signInAnonymously(auth).then((result) => {
+    const provider = new (
+      loginType === "fb" ? FacebookAuthProvider : GoogleAuthProvider
+    )();
+    return linkWithPopup(auth.currentUser, provider);
+  });
+  toggleSigninButton(getAuth().currentUser);
+}
+
+async function handleLoginLinkAccounts(e) {
+  const login = e.target.dataset.login;
+  if (!login) return;
+  if (login !== "anon") {
+    await linkAccounts(login);
+  }
+  authPage.classList.add("hidden");
+  authPage.removeEventListener("click", handleLoginLinkAccounts);
+}
+
+function handleSigninButton() {
+  authPage.classList.remove("hidden");
+  authPage.addEventListener("click", handleLoginLinkAccounts);
+}
 
 function toggleSigninButton(user) {
   const button = document.querySelector(".signin-button");
@@ -57,7 +86,7 @@ function toggleSigninButton(user) {
     nameDiv.classList.add("hidden");
     button.addEventListener("click", handleSigninButton);
   } else {
-    nameDiv.textContent = `Logged in as ${user.displayName}`;
+    nameDiv.textContent = `Logged in as ${user.displayName || user.email}`;
     nameDiv.classList.remove("hidden");
     button.classList.add("hidden");
     button.removeEventListener("click", handleSigninButton);
@@ -514,8 +543,8 @@ function initNewUser() {
   const dueDate = new Date(add(new Date(), { weeks: 1 }));
   forms[1].addToList({
     newObj: todoFactory({
-      name: "Fill Todo App",
-      description: "Fill this Todo App so it can assist me in my busy life.",
+      name: "Fill To-do App",
+      description: "Fill this To-do App so it can assist me in my busy life.",
       dueDate,
       priority: "medium",
       notes: "Very Important.",
@@ -531,8 +560,8 @@ function initNewUser() {
   });
   forms[1].addToList({
     newObj: todoFactory({
-      name: "Past Todo",
-      description: "Todos look like this when their due date is in the past.",
+      name: "Past To-do",
+      description: "To-dos look like this when their due date is in the past.",
       dueDate: new Date(1999, 12, 31),
       priority: "low",
       isDone: false,
@@ -541,9 +570,9 @@ function initNewUser() {
   });
   forms[1].addToList({
     newObj: todoFactory({
-      name: "Today Todo",
+      name: "Today To-do",
       description:
-        "Todos look like this when their due date is the present day.",
+        "To-dos look like this when their due date is the present day.",
       dueDate: new Date(),
       priority: "high",
       isDone: false,
@@ -604,3 +633,5 @@ onAuthStateChanged(getAuth(), async (user) => {
     }
   }
 });
+
+window.setTimeout(() => console.log(getAuth().currentUser), 3000);
